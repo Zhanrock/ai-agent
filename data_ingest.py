@@ -1,14 +1,51 @@
-# data_ingest.py (concept)
+# data_ingest.py
+import os
+import pdfplumber
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import PyPDFLoader
-from langchain.embeddings import SentenceTransformerEmbeddings
+from sentence_transformers import SentenceTransformer
 import chromadb
+from chromadb.config import Settings
 
-loader = PyPDFLoader("manual.pdf")
-docs = loader.load()
-splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=120)
-chunks = splitter.split_documents(docs)
+PDF_PATH = "manual.pdf"
+PERSIST_DIR = "./chroma_db"
 
-# embeddings
-emb = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-# create chroma client and upsert chunks (title, text)
+def load_pdf_text(pdf_path):
+    pages = []
+    with pdfplumber.open(pdf_path) as pdf:
+        for i, page in enumerate(pdf.pages, start=1):
+            text = page.extract_text() or ""
+            pages.append({"page": i, "text": text})
+    return pages
+
+def chunk_pages(pages, chunk_size=800, overlap=120):
+    splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)
+    docs = []
+    for p in pages:
+        # create a pseudo document with page-level metadata
+        docs.extend(splitter.split_text(p["text"]))
+    # We'll keep metadata mapping when adding to DB
+    return docs
+
+def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name="manual_collection"):
+    # Embedding model
+    emb_model = SentenceTransformer("all-MiniLM-L6-v2")
+    # Chroma client with persistence
+    client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=persist_dir))
+    collection = client.get_or_create_collection(name=collection_name)
+
+    texts = [d for d in docs]
+    embeddings = emb_model.encode(texts, show_progress_bar=True).tolist()
+
+    # Generate simple unique ids
+    ids = [f"doc_{i}" for i in range(len(texts))]
+    metadatas = [{"source": f"manual_page_chunk_{i}"} for i in range(len(texts))]
+
+    # Add to chroma (if collection already has documents you may want to clear or skip)
+    collection.add(documents=texts, metadatas=metadatas, ids=ids, embeddings=embeddings)
+    client.persist()
+    print(f"Persisted {len(texts)} chunks to Chroma at {persist_dir}")
+
+if __name__ == "__main__":
+    pages = load_pdf_text(PDF_PATH)
+    docs = chunk_pages(pages)
+    build_vector_db(docs)
