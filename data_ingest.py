@@ -30,8 +30,8 @@ def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name="manual_colle
     # Embedding model
     emb_model = SentenceTransformer("all-MiniLM-L6-v2")
     # Chroma client with persistence
-    client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=persist_dir))
-    collection = client.get_or_create_collection(name=collection_name)
+    client = chromadb.PersistentClient(path=PERSIST_DIR)
+    collection = client.get_or_create_collection(name="manual_collection")
 
     texts = [d for d in docs]
     embeddings = emb_model.encode(texts, show_progress_bar=True).tolist()
@@ -42,7 +42,7 @@ def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name="manual_colle
 
     # Add to chroma (if collection already has documents you may want to clear or skip)
     collection.add(documents=texts, metadatas=metadatas, ids=ids, embeddings=embeddings)
-    client.persist()
+    # client.persist()
     print(f"Persisted {len(texts)} chunks to Chroma at {persist_dir}")
 
 if __name__ == "__main__":

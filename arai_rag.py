@@ -15,7 +15,7 @@ TOP_K = 3
 
 # init
 emb_model = SentenceTransformer(EMB_MODEL_NAME)
-client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet", persist_directory=PERSIST_DIR))
+client = chromadb.PersistentClient(path=PERSIST_DIR)
 collection = client.get_collection(name=COLLECTION_NAME)
 
 try:
