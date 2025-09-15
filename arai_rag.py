@@ -34,38 +34,48 @@ def retrieve(query, top_k=TOP_K):
         })
     return docs
 
-PROMPT_TEMPLATE = """
-You are a clear, concise assistant. Use the following retrieved excerpts (numbered).
-Provide a short step-by-step answer to the user's question and reference which excerpt(s) you used.
-
-EXCERPTS:
-{excerpts}
-
-Question: {question}
-
-Answer:
-"""
-
-def answer_question(query, top_k=TOP_K):
+def answer_question(query, style="bullet", top_k=TOP_K):
+    """
+    Answer user question based on retrieved chunks.
+    style = "bullet" or "sentence"
+    """
     hits = retrieve(query, top_k=top_k)
     excerpts = []
     for i, h in enumerate(hits, start=1):
-        text = textwrap.shorten(h["text"], width=500, placeholder="...")
+        text = textwrap.shorten(h["text"], width=600, placeholder="...")
         excerpts.append(f"[{i}] {text}")
 
-    prompt = PROMPT_TEMPLATE.format(excerpts="\n\n".join(excerpts), question=query)
+    if style == "bullet":
+        format_instructions = "Write the answer in 3–6 concise bullet points."
+    else:
+        format_instructions = "Write the answer in 2–3 short paragraphs."
+
+    prompt = f"""
+    You are a precise assistant for employees.
+    Only use excerpts directly relevant to the question. 
+    Ignore anything unrelated (even if retrieved).
+
+    Question: {query}
+
+    Excerpts:
+    {chr(10).join(excerpts)}
+
+    Answer format: {format_instructions}
+    """
 
     if generator:
-        out = generator(prompt, max_length=256)[0]["generated_text"]
+        out = generator(prompt, max_new_tokens=300)[0]["generated_text"]
     else:
-        out = "Fallback: Sources only.\n" + "\n".join(excerpts)
+        out = "Fallback: " + "\n".join(excerpts)
 
     sources = [{"meta": h["meta"], "text": h["text"]} for h in hits]
     return out, sources
 
+
+# Test run
 if __name__ == "__main__":
-    question = input("Enter your question: ")
-    # q = "How do I process a refund?"
-    ans, sources = answer_question(question)
-    print("ANSWER:\n", ans)
-    # print("SOURCES:\n", sources)
+    q = input("Enter your question: ")
+    style_choice = input("Answer style? (bullet/sentence): ").strip().lower()
+    ans, sources = answer_question(q, style=style_choice)
+    print("\nANSWER:\n", ans)
+    # print("\nSOURCES:\n", sources)

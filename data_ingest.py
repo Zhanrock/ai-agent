@@ -17,7 +17,7 @@ def load_pdf_text(pdf_path):
             pages.append({"page": i, "text": text})
     return pages
 
-def chunk_pages(pages, chunk_size=800, overlap=120):
+def chunk_pages(pages, chunk_size=400, overlap=50):
     splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=overlap)
     docs = []
     for p in pages:
