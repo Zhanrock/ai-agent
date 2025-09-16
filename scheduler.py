@@ -10,7 +10,7 @@ def solve_schedule(avail_df):
     # Initialize schedule
     schedule = pd.DataFrame(0, index=employees, columns=shifts)
 
-    # Shuffle employees to reduce bias from list order
+    # Shuffle employees to reduce bias
     random.shuffle(employees)
 
     # Assign shifts
@@ -25,3 +25,17 @@ def solve_schedule(avail_df):
             schedule.loc[chosen, s] = 1
 
     return schedule
+
+def swap_shift(schedule, emp1, emp2, shift):
+    """
+    Swap shifts between two employees only if both have the shift assigned (1).
+    Returns True if swap successful, False otherwise.
+    """
+    val1 = schedule.loc[emp1, shift]
+    val2 = schedule.loc[emp2, shift]
+
+    if val1 == 1 and val2 == 1:
+        schedule.loc[emp1, shift], schedule.loc[emp2, shift] = val2, val1
+        return True
+    else:
+        return False

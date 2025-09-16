@@ -1,7 +1,7 @@
 #app.py
 import streamlit as st
 import pandas as pd
-from scheduler import solve_schedule
+from scheduler import solve_schedule, swap_shift
 from arai_rag import answer_question
 
 st.set_page_config(layout="wide")
@@ -54,7 +54,7 @@ with tabs[0]:
     # Clear button action
     if st.button("Clear Answers"):
         st.session_state['arai_history'] = []
-        st.experimental_rerun()  # Rerun to clear the display immediately
+        st.rerun()  # Rerun to clear the display immediately
 
     # Display history from newest to oldest
     for h_idx, h in reversed(list(enumerate(st.session_state['arai_history']))):
@@ -112,16 +112,13 @@ with tabs[1]:
             shift_sel = st.selectbox("Shift to swap", shifts)
 
         if st.button("Swap Shift"):
-            val1 = schedule.loc[emp1, shift_sel]
-            val2 = schedule.loc[emp2, shift_sel]
-            try:
-                schedule.loc[emp1, shift_sel], schedule.loc[emp2, shift_sel] = int(val2), int(val1)
+            success = swap_shift(schedule, emp1, emp2, shift_sel)
+            if success:
                 st.session_state['schedule'] = schedule
-                st.success(f"✅ Swapped {shift_sel} between {emp1} and {emp2}")
-                # อัปเดตตารางทันที
-                schedule_display.dataframe(schedule.style.applymap(highlight_schedule))
-            except Exception as e:
-                st.error(f"⚠️ Cannot swap: {e}")
+                st.success(f"Swapped {shift_sel} between {emp1} and {emp2}")
+            else:
+                st.warning("Swap not allowed: both employees must have this shift assigned (1).")
+            st.dataframe(schedule.style.applymap(highlight_schedule))
 
         # Download CSV
         csv = schedule.to_csv(index=True).encode('utf-8')
