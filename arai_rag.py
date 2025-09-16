@@ -65,6 +65,10 @@ def answer_question(query, style="bullet", top_k=TOP_K, max_prompt_tokens_margin
     kws = [w for w in re.findall(r"\w+", query.lower()) if len(w) > 2]
     hits = retrieve(query, top_k=top_k)
 
+    # If no hits or the top hit is not relevant, return custom message
+    if not hits or hits[0]["score"] > 1.0:  # adjust threshold as needed
+        return "Sorry, that question is unrelated to the manual and cannot be answered.", []
+
     # Find the most relevant section (e.g., "Latte")
     target_section = None
     for h in hits:
@@ -94,23 +98,14 @@ def answer_question(query, style="bullet", top_k=TOP_K, max_prompt_tokens_margin
 
     if style == "bullet":
         style_instr = "Write the answer as 3-6 concise bullet points. Keep exact numbers and steps."
+        context_text = "\n".join(f"• {s}" for _, s in pieces)  # bullet points, new line for each
     else:
         style_instr = "Write the answer in 2-3 short paragraphs. Keep exact numbers and steps."
-
-    context_text = "\n".join(f"- {s}" for _, s in pieces)
+        context_text = " ".join(s for _, s in pieces)  # single paragraph
 
     prompt = f"""You are an accurate assistant for employees.
 ONLY use the excerpts below to answer the question.
 Do NOT invent extra steps.
-
-You are a helpful assistant. Answer ONLY from the provided sources. 
-- If multiple recipes are retrieved, identify the section most relevant to the user’s question.
-- Do not mix instructions from other drinks or sections.
-- If the user asks 'How to make latte?', only return the steps from the 'Latte' section.
-- Stop your answer at the last step in that section, even if more text is retrieved.
-- If unsure, only answer with the exact section text.
-- Answer in the style requested (bullet or sentence).
-
 
 Question: {query}
 
@@ -124,6 +119,24 @@ Answer format: {style_instr}
         out = generator(prompt, max_new_tokens=220)[0]["generated_text"]
     else:
         out = "⚠️ Generator not available."
+
+    # Try to split steps if model outputs in a single line
+    if style == "bullet":
+        # Split on any "Step n:"
+        out = re.sub(r"(Step \d+:)", r"\n• \1", out)
+        lines = [line.strip() for line in out.split("\n") if line.strip()]
+        # Normalize lines for duplicate removal
+        def normalize(line):
+            return re.sub(r'\s+', ' ', line.lower()).strip()
+        seen = set()
+        deduped = []
+        for x in lines:
+            norm = normalize(x)
+            if norm not in seen:
+                deduped.append(x)
+                seen.add(norm)
+        deduped = [x for x in deduped if not re.match(r".*\bas\b$", x)]
+        out = "\n".join(deduped)
 
     # Collect source section titles
     source_ids = []

@@ -1,0 +1,5 @@
+﻿Employee,MaxHoursPerWeek,Mon_AM,Mon_PM,Tue_AM,Tue_PM,Wed_AM,Wed_PM,Thu_AM,Thu_PM,Fri_AM,Fri_PM,Sat_AM,Sat_PM,Sun_AM,Sun_PM
+Alice,20,1,1,0,1,1,0,1,1,0,1,1,0,1,0
+Bob,18,0,1,1,1,0,1,1,0,1,1,0,1,1,0
+Charlie,22,1,0,1,0,1,1,0,1,1,0,1,1,0,1
+Diana,20,1,1,1,1,1,1,1,1,0,0,1,1,0,0
