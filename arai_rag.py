@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
 import chromadb
+from chromadb.config import Settings
 from transformers import pipeline, AutoTokenizer
 import re
 
@@ -13,7 +14,13 @@ TOP_K = 5
 
 # Init embeddings & DB
 emb_model = SentenceTransformer(EMB_MODEL_NAME)
-client = chromadb.PersistentClient(path=PERSIST_DIR)
+client = chromadb.Client(
+    Settings(
+        chroma_db_impl="duckdb+parquet",
+        persist_directory=PERSIST_DIR
+    )
+)
+
 collection = client.get_collection(name=COLLECTION_NAME)
 
 # Init generator + tokenizer

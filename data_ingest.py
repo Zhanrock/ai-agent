@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from PyPDF2 import PdfReader
 from sentence_transformers import SentenceTransformer
+from chromadb.config import Settings
 import chromadb
 
 PERSIST_DIR = "./chroma_db"
@@ -47,7 +48,13 @@ def split_by_sections(text):
 
 def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name=COLLECTION_NAME):
     emb_model = SentenceTransformer(EMB_MODEL_NAME)
-    client = chromadb.PersistentClient(path=persist_dir)
+    client = chromadb.Client(
+    Settings(
+        chroma_db_impl="duckdb+parquet",
+        persist_directory=persist_dir
+    )
+)
+
     
     # --- ADD THIS LINE ---
     try:
