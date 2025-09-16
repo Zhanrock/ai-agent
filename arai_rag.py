@@ -18,7 +18,6 @@ emb_model = SentenceTransformer(EMB_MODEL_NAME)
 # New client creation
 client = chromadb.Client(
     settings=chromadb.Settings(
-        chroma_api_impl="LocalAPI",
         chroma_db_impl="duckdb+parquet",
         persist_directory=PERSIST_DIR
     )
