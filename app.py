@@ -1,4 +1,12 @@
 #app.py
+import os
+import sys
+
+# This check ensures the code only runs in a deployed environment
+# where the issue occurs, not locally.
+if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+    __import__("pysqlite3")
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 import streamlit as st
 import pandas as pd
 from scheduler import solve_schedule, swap_shift
