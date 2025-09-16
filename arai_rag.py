@@ -16,12 +16,7 @@ TOP_K = 5
 # Init embeddings & DB
 emb_model = SentenceTransformer(EMB_MODEL_NAME)
 # New client creation
-client = chromadb.Client(
-    settings=chromadb.Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory=PERSIST_DIR
-    )
-)
+client = chromadb.PersistentClient(path="db/")
 
 # Use the same code for your collection
 collection = client.get_or_create_collection(
