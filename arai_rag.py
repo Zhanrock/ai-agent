@@ -1,5 +1,21 @@
 from sentence_transformers import SentenceTransformer
 import chromadb
+chromadb.config.telemetry = False
+
+import chromadb.segment.impl.metadata.sqlite as sqlite_module
+
+def safe_decode_seq_id(seq_id_bytes):
+    if isinstance(seq_id_bytes, int):
+        return seq_id_bytes
+    if len(seq_id_bytes) == 8:
+        return int.from_bytes(seq_id_bytes, "big")
+    elif len(seq_id_bytes) == 24:
+        return int.from_bytes(seq_id_bytes, "big")
+    else:
+        raise ValueError(f"Unexpected seq_id_bytes: {seq_id_bytes}")
+
+sqlite_module._decode_seq_id = safe_decode_seq_id
+
 from chromadb.utils import embedding_functions
 from transformers import pipeline, AutoTokenizer
 import re
