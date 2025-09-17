@@ -47,15 +47,7 @@ def split_by_sections(text):
 
 
 def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name=COLLECTION_NAME):
-    emb_model = SentenceTransformer(EMB_MODEL_NAME)
-    client = chromadb.Client(
-    Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory=persist_dir
-    )
-)
-
-    
+    client = chromadb.PersistentClient(path=persist_dir)    
     # --- ADD THIS LINE ---
     try:
         client.delete_collection(name=collection_name)
@@ -65,11 +57,10 @@ def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name=COLLECTION_NA
     collection = client.get_or_create_collection(name=collection_name)
 
     texts = [d["content"] for d in docs]
-    embeddings = emb_model.encode(texts, show_progress_bar=True).tolist()
     ids = [f"section_{i}" for i in range(len(texts))]
     metadatas = [{"title": d["title"]} for d in docs]
 
-    collection.add(documents=texts, metadatas=metadatas, ids=ids, embeddings=embeddings)
+    collection.add(documents=texts, metadatas=metadatas, ids=ids)
     print(f"✅ Persisted {len(texts)} sections into Chroma at {persist_dir}")
 
 if __name__ == "__main__":

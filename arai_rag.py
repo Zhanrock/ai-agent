@@ -1,7 +1,6 @@
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.utils import embedding_functions
-from chromadb.config import Settings
 from transformers import pipeline, AutoTokenizer
 import re
 
@@ -14,15 +13,12 @@ TOP_K = 5
 # ----------------------------------------
 
 # Init embeddings & DB
-emb_model = SentenceTransformer(EMB_MODEL_NAME)
-# New client creation
-client = chromadb.PersistentClient(path="db/")
-
-# Use the same code for your collection
-collection = client.get_or_create_collection(
-    name=COLLECTION_NAME,
-    embedding_function=embedding_functions.SentenceTransformerEmbeddingFunction(model_name=EMB_MODEL_NAME)
+# Init Chroma client + embedding function
+embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(
+    model_name=EMB_MODEL_NAME
 )
+client = chromadb.PersistentClient(path=PERSIST_DIR)
+collection = client.get_collection(name=COLLECTION_NAME)
 
 # Init generator + tokenizer
 try:
@@ -36,9 +32,8 @@ except Exception as e:
 
 # ---------------- HELPERS ----------------
 def retrieve(query, top_k=TOP_K):
-    qvec = emb_model.encode([query])[0].tolist()
     res = collection.query(
-        query_embeddings=[qvec],
+        query_texts=[query],
         n_results=top_k,
         include=["documents", "metadatas", "distances"]
     )
@@ -50,6 +45,7 @@ def retrieve(query, top_k=TOP_K):
             "score": res["distances"][0][idx]
         })
     return docs
+
 
 
 def split_sentences(text):
