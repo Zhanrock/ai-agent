@@ -143,5 +143,5 @@ with tabs[1]:
 # ---- About Tab ----
 with tabs[2]:
     st.write("FAN - Franchise AI Navigator")
-    st.write("Developed by Gimmie (Backend/UI/OR-Tools)")
+    st.write("Developed by Gimmie and Zharock")
 

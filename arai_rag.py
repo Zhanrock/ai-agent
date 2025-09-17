@@ -85,6 +85,18 @@ def extract_relevant_sentences(hits, query_keywords, max_sentences_per_hit=3):
 def answer_question(query, style="bullet", top_k=TOP_K, max_prompt_tokens_margin=50):
     kws = [w for w in re.findall(r"\w+", query.lower()) if len(w) > 2]
     hits = retrieve(query, top_k=top_k)
+    hits = sorted(hits, key=lambda h: h["score"])  # lower score = more relevant
+
+    # Deduplicate documents by text
+    seen_texts = set()
+    unique_hits = []
+    for h in hits:
+        text = h["text"].strip()
+        if text not in seen_texts:
+            unique_hits.append(h)
+            seen_texts.add(text)
+
+    hits = unique_hits
 
     # If no hits or the top hit is not relevant, return custom message
     if not hits or hits[0]["score"] > 1.0:  # adjust threshold as needed
