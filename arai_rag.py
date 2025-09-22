@@ -1,6 +1,9 @@
-from sentence_transformers import SentenceTransformer
 import chromadb
 chromadb.config.telemetry = False
+import os
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 import chromadb.segment.impl.metadata.sqlite as sqlite_module
 
@@ -16,34 +19,21 @@ def safe_decode_seq_id(seq_id_bytes):
 
 sqlite_module._decode_seq_id = safe_decode_seq_id
 
-from chromadb.utils import embedding_functions
-from transformers import pipeline, AutoTokenizer
 import re
 
 # ---------------- CONFIG ----------------
 PERSIST_DIR = "./chroma_db"
 COLLECTION_NAME = "manual_collection"
 EMB_MODEL_NAME = "all-MiniLM-L6-v2"
-GEN_MODEL = "google/flan-t5-base"   # small but decent
+
 TOP_K = 5
 # ----------------------------------------
 
 # Init embeddings & DB
 # Init Chroma client + embedding function
-embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(
-    model_name=EMB_MODEL_NAME
-)
-client = chromadb.PersistentClient(path=PERSIST_DIR)
-collection = client.get_collection(name=COLLECTION_NAME)
 
-# Init generator + tokenizer
-try:
-    generator = pipeline("text2text-generation", model=GEN_MODEL)
-    tokenizer = AutoTokenizer.from_pretrained(GEN_MODEL, use_fast=True)
-    print("Device set to use", generator.device)
-except Exception as e:
-    print("❌ Generator load failed:", e)
-    generator, tokenizer = None, None
+chroma_client = chromadb.PersistentClient(path=PERSIST_DIR)
+collection = chroma_client.get_collection(name=COLLECTION_NAME)
 
 
 # ---------------- HELPERS ----------------
@@ -157,10 +147,28 @@ Excerpts:
 Answer format: {style_instr}
 """
 
-    if generator:
-        out = generator(prompt, max_new_tokens=220)[0]["generated_text"]
-    else:
-        out = "⚠️ Generator not available."
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",   # or "gpt-4o" if you have quota
+            messages=[
+                {
+                "role": "system",
+                "content": (
+                    "You are an accurate assistant for employees. "
+                    "ONLY use the provided excerpts. "
+                    "Do not invent extra steps. "
+                    "Stop after completing the last relevant step."
+                )
+            },
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=400,
+            temperature=0
+        )
+        out = response.choices[0].message.content.strip()
+    except Exception as e:
+        out = f"⚠️ OpenAI API call failed: {e}"
+
 
     # Try to split steps if model outputs in a single line
     if style == "bullet":
