@@ -72,8 +72,7 @@ def extract_relevant_sentences(hits, query_keywords, max_sentences_per_hit=3):
 
 
 # ---------------- MAIN ANSWER ----------------
-def answer_question(query, style="bullet", top_k=TOP_K, max_prompt_tokens_margin=50):
-    kws = [w for w in re.findall(r"\w+", query.lower()) if len(w) > 2]
+def answer_question(query, style="bullet", top_k=TOP_K):
     hits = retrieve(query, top_k=top_k)
     hits = sorted(hits, key=lambda h: h["score"])  # lower score = more relevant
 
