@@ -1,0 +1,24 @@
+{
+    "nudges": [
+        {
+            "type": "motivation",
+            "message": "Keep up the great work! Every small step counts."
+        },
+        {
+            "type": "focus",
+            "message": "Try to finish your top 3 priorities first today."
+        },
+        {
+            "type": "learning",
+            "message": "Review yesterday\u2019s feedback to improve efficiency."
+        },
+        {
+            "type": "wellbeing",
+            "message": "Take a short walk to refresh your mind."
+        },
+        {
+            "type": "collaboration",
+            "message": "Reach out to a teammate for feedback on your task."
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+    "challenges": [
+        {
+            "title": "Optimize Task Flow",
+            "description": "Reduce bottlenecks in current project workflow",
+            "difficulty": "Medium"
+        },
+        {
+            "title": "AI Prototype",
+            "description": "Build a simple AI model for idea recommendations",
+            "difficulty": "High"
+        },
+        {
+            "title": "Team Engagement",
+            "description": "Increase participation in team brainstorming sessions",
+            "difficulty": "Low"
+        },
+        {
+            "title": "Bug Hunt",
+            "description": "Identify and fix critical bugs in the codebase",
+            "difficulty": "High"
+        },
+        {
+            "title": "Design Sprint",
+            "description": "Rapid prototyping of new interface design",
+            "difficulty": "Medium"
+        }
+    ]
+}
