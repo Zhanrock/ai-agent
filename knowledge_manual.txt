@@ -1,0 +1,27 @@
+Section 2: Knowledge Sharing & Standards
+2.1 Introduction
+• The purpose of this manual is to guide employees in knowledge management.
+• Focus areas include documentation, sharing platforms, and collaboration.
+
+2.2 Documentation Standards
+• Step 1: All project documentation must follow the company template.
+• Step 2: Store files in the central knowledge repository.
+• Step 3: Use version control for all technical documents.
+• Step 4: Review documentation quarterly for accuracy.
+
+2.3 Knowledge Sharing Platforms
+• Slack Channels – use #project-updates for ongoing tasks.
+• Confluence – store technical write-ups and guides.
+• Weekly Knowledge Sessions – every Friday at 3 PM for live sharing.
+
+2.4 Collaboration Guidelines
+• Step 1: Start with a shared project charter in the repository.
+• Step 2: Define clear ownership for each deliverable.
+• Step 3: Hold a 15-minute stand-up meeting daily for sync.
+• Step 4: Conduct a post-mortem session after project completion.
+
+2.5 Best Practices
+• Encourage open communication across teams.
+• Use data-driven evidence to support proposals.
+• Recognize contributors in knowledge sessions.
+• Continuously update and refine processes based on feedback.

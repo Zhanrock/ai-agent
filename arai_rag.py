@@ -23,21 +23,31 @@ import re
 
 # ---------------- CONFIG ----------------
 PERSIST_DIR = "./chroma_db"
-COLLECTION_NAME = "manual_collection"
 EMB_MODEL_NAME = "all-MiniLM-L6-v2"
-
 TOP_K = 5
 # ----------------------------------------
-
+COLLECTION_MAP = {
+    "arai": "arai_collection",
+    "jai": "jai_collection",
+    "kai": "kai_collection"
+}
 # Init embeddings & DB
 # Init Chroma client + embedding function
 
 chroma_client = chromadb.PersistentClient(path=PERSIST_DIR)
-collection = chroma_client.get_collection(name=COLLECTION_NAME)
 
+
+def get_collection(name):
+    c = chromadb.PersistentClient(path=PERSIST_DIR)
+    return c.get_collection(name=name)
 
 # ---------------- HELPERS ----------------
-def retrieve(query, top_k=TOP_K):
+def retrieve(query, agent, top_k=TOP_K):
+    collection_name = COLLECTION_MAP.get(agent)
+    if not collection_name:
+        raise ValueError(f"Unknown agent: {agent}")
+    collection = chroma_client.get_collection(name=collection_name)
+
     res = collection.query(
         query_texts=[query],
         n_results=top_k,
@@ -72,8 +82,8 @@ def extract_relevant_sentences(hits, query_keywords, max_sentences_per_hit=3):
 
 
 # ---------------- MAIN ANSWER ----------------
-def answer_question(query, style="bullet", top_k=TOP_K):
-    hits = retrieve(query, top_k=top_k)
+def answer_question(query, agent, style="bullet", top_k=TOP_K):
+    hits = retrieve(query, agent=agent, top_k=top_k)
     hits = sorted(hits, key=lambda h: h["score"])  # lower score = more relevant
 
     # Deduplicate documents by text
@@ -134,7 +144,7 @@ def answer_question(query, style="bullet", top_k=TOP_K):
         style_instr = "Write the answer in 2-3 short paragraphs. Keep exact numbers and steps."
         context_text = " ".join(s for _, s in pieces if s.strip() and s.strip() != title)
 
-    prompt = f"""You are an accurate assistant for employees.
+    prompt = f"""You are an accurate assistant {agent.upper()}, an assistant for employees.
 ONLY use the excerpts below to answer the question.
 Do NOT invent extra steps.
 
@@ -225,10 +235,12 @@ Answer format: {style_instr}
 
 # ---------------- INTERACTIVE ----------------
 if __name__ == "__main__":
+    agent_choice = input("Choose agent (arai/jai/kai): ").strip().lower()
     q = input("Enter your question: ")
     style_choice = input("Answer style? (bullet/sentence): ").strip().lower()
-    ans, sources = answer_question(q, style=style_choice)
-    print("\nANSWER:\n", ans)
+
+    ans, sources = answer_question(q, agent=agent_choice, style=style_choice)
+    print(f"\n[{agent_choice.upper()}] ANSWER:\n", ans)
     print("\nSOURCES:")
     for s in sources:
         print(f"- {s['section']} → {s['preview'][:80]}...\n")

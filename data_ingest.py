@@ -6,11 +6,11 @@ from chromadb.config import Settings
 import chromadb
 
 PERSIST_DIR = "./chroma_db"
-COLLECTION_NAME = "manual_collection"
 EMB_MODEL_NAME = "all-MiniLM-L6-v2"
 
 
-def load_manual(path):
+
+def load_pdf(path):
     """Load text from a PDF file."""
     reader = PdfReader(path)
     text = ""
@@ -18,6 +18,19 @@ def load_manual(path):
         text += page.extract_text() + "\n"
     return text
 
+def load_txt(path):
+    """Load text from a TXT file."""
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+    
+def load_manual(path):
+    """Auto-detect file type and load content."""
+    if path.lower().endswith(".pdf"):
+        return load_pdf(path)
+    elif path.lower().endswith(".txt"):
+        return load_txt(path)
+    else:
+        raise ValueError(f"Unsupported file format: {path}")
 
 def split_by_sections(text):
     """
@@ -46,7 +59,7 @@ def split_by_sections(text):
     return grouped
 
 
-def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name=COLLECTION_NAME):
+def build_vector_db(docs, collection_name, persist_dir=PERSIST_DIR):
     client = chromadb.PersistentClient(path=persist_dir)    
     # --- ADD THIS LINE ---
     try:
@@ -57,14 +70,23 @@ def build_vector_db(docs, persist_dir=PERSIST_DIR, collection_name=COLLECTION_NA
     collection = client.get_or_create_collection(name=collection_name)
 
     texts = [d["content"] for d in docs]
-    ids = [f"section_{i}" for i in range(len(texts))]
+    ids = [f"{collection_name}_section_{i}" for i in range(len(texts))]
     metadatas = [{"title": d["title"]} for d in docs]
 
     collection.add(documents=texts, metadatas=metadatas, ids=ids)
-    print(f"✅ Persisted {len(texts)} sections into Chroma at {persist_dir}")
+    print(f"✅ Persisted {len(texts)} sections into Chroma (collection='{collection_name}')")
 
 if __name__ == "__main__":
-    manual_path = "manual_chat.pdf"   # update filename if needed
-    text = load_manual(manual_path)
-    docs = split_by_sections(text)
-    build_vector_db(docs)
+    manuals = {
+        "arai": "manual_chat.pdf",
+        "jai": "career_manual.txt",
+        "kai": "knowledge_manual.txt"
+    }
+    for name, filepath in manuals.items():
+        if not Path(filepath).exists():
+            print(f"⚠️ Skipping {filepath} (file not found)")
+            continue
+        print(f"\n📖 Ingesting {filepath} into collection '{name}_collection'")
+        text = load_manual(filepath)
+        docs = split_by_sections(text)
+        build_vector_db(docs, collection_name=f"{name}_collection", persist_dir=PERSIST_DIR)
