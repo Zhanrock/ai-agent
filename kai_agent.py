@@ -33,7 +33,8 @@ def submit_idea(idea_text, employee, branch):
         "idea_text": idea_text,
         "submitted_by": employee,
         "branch_id": branch,
-        "upvotes": 1
+        "upvotes": 1,
+        "timestamp": pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
     }])
 
     df = pd.concat([df, new_row], ignore_index=True)
