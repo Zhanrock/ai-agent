@@ -1,11 +1,6 @@
-date,task,score,efficiency,comments
-2025-01-01,Data Analysis,85,0.9,Good insights
-2025-01-05,Report Writing,78,0.8,Needs clarity in conclusion
-2025-01-10,Code Review,92,0.95,Excellent attention to detail
-2025-01-15,UI Design,88,0.85,Creative layout
-2025-01-20,Testing,80,0.9,Thorough test cases
-2025-01-25,Presentation,90,0.92,Clear and engaging
-2025-01-30,Research,84,0.88,Comprehensive references
-2025-02-04,Debugging,87,0.9,Fixed major issues
-2025-02-09,Team Collaboration,91,0.95,Great teamwork
-2025-02-14,Prototyping,89,0.9,Fast and effective prototype
+employee_id,name,role,order_accuracy_percent,avg_speed_seconds,customer_feedback_score,skills_unlocked
+101,Alex,Barista,98,42,4.8,""Espresso Calibration"
+102,Maria,Barista,97,40,4.5,""Latte Art"
+103,David,Shift Lead,99,39,4.2,"Espresso Calibration;Latte Art;Inventory Basics"
+104,Chloe,Shift Lead,100,38,4.9,"Inventory Basics;Cash Handling Reconciliation"
+105,Ben,Barista,85,60,3.5,""

@@ -1,0 +1,14 @@
+{
+  "current_challenge": {
+    "title": "Latte Art Throwdown!",
+    "goal": "Sell the most lattes with latte art this week.",
+    "prize": "Pizza party for the winning shift team!"
+  },
+  "past_challenges": [
+    {
+      "title": "Reusable Cup Week",
+      "goal": "Encourage customers to bring reusable cups.",
+      "winner": "Paya Lebar Branch"
+    }
+  ]
+}

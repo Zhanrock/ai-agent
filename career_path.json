@@ -1,29 +1,14 @@
 {
-    "name": "Jai",
-    "current_role": "Junior Analyst",
-    "roles": [
-        {
-            "title": "Intern",
-            "duration_months": 6
-        },
-        {
-            "title": "Junior Analyst",
-            "duration_months": 12
-        },
-        {
-            "title": "Analyst",
-            "duration_months": 18
-        }
-    ],
-    "skills": [
-        "Data Analysis",
-        "Reporting",
-        "Python",
-        "Communication"
-    ],
-    "goals": [
-        "Lead a project team",
-        "Become Data Scientist",
-        "Mentor new interns"
-    ]
+  "Barista": {
+    "next_role": "Shift Lead",
+    "skills_required": ["Espresso Calibration", "Latte Art", "Customer De-escalation"]
+  },
+  "Shift Lead": {
+    "next_role": "Assistant Manager",
+    "skills_required": ["Inventory Basics", "Cash Handling Reconciliation", "Team Communication"]
+  },
+  "Assistant Manager": {
+    "next_role": "Store Manager",
+    "skills_required": ["Team Leadership", "Budgeting Basics", "Staff Scheduling"]
+  }
 }

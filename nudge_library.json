@@ -1,24 +1,8 @@
 {
-    "nudges": [
-        {
-            "type": "motivation",
-            "message": "Keep up the great work! Every small step counts."
-        },
-        {
-            "type": "focus",
-            "message": "Try to finish your top 3 priorities first today."
-        },
-        {
-            "type": "learning",
-            "message": "Review yesterday\u2019s feedback to improve efficiency."
-        },
-        {
-            "type": "wellbeing",
-            "message": "Take a short walk to refresh your mind."
-        },
-        {
-            "type": "collaboration",
-            "message": "Reach out to a teammate for feedback on your task."
-        }
-    ]
+  "Espresso Calibration": "Great progress! To prepare for Shift Lead, master 'Espresso Calibration'. Try practicing daily checks and record consistency in taste and flow.",
+  "Latte Art": "Nice pours! Next step: refine your latte art under rush conditions — speed plus artistry builds leadership readiness.",
+  "Customer De-escalation": "Practice calming upset customers using the L.A.S.T. model: Listen, Acknowledge, Solve, Thank.",
+  "Inventory Basics": "Shadow your Shift Lead during stock counts this week. Understanding par levels is essential for your next role.",
+  "Cash Handling Reconciliation": "Ask to assist with the daily till close. Accuracy here builds trust for promotion.",
+  "Team Communication": "Run the next team huddle — clear instructions and encouragement are key leadership skills."
 }
