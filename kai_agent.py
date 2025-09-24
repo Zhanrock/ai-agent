@@ -102,23 +102,23 @@ def manager_summary():
 def run_kai():
     print("🤝 Welcome to KAI - The Team & Community Agent")
     print("Choose a command:")
-    print("1. Submit Idea")
-    print("2. Upvote Idea")
-    print("3. View Challenge")
+    print("1. View Challenge")
+    print("2. Submit Idea")
+    print("3. Upvote Idea")
     print("4. Post Kudos")
     print("5. Manager Summary")
 
     choice = input("Enter number: ").strip()
 
-    if choice == "1":
+    if choice == "2":
         idea = input("Enter your idea: ")
         emp = input("Your name: ")
         branch = input("Branch ID: ")
         print(submit_idea(idea, emp, branch))
-    elif choice == "2":
+    elif choice == "3":
         idea_id = int(input("Enter Idea ID to upvote: "))
         print(upvote_idea(idea_id))
-    elif choice == "3":
+    elif choice == "1":
         print(view_challenge())
     elif choice == "4":
         f = input("From Employee: ")

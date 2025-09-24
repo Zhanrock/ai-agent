@@ -85,13 +85,18 @@ Tip: {tip}
 """
 
 
-def get_skill_tree():
-    return """
-🌳 My Skill Tree
-- Inventory Management → Retail, logistics, supply chain
-- Customer De-escalation → Leadership & soft skills
-- Cash Handling → Finance, retail, banking
-"""
+def get_skill_tree(employee_id):
+    df = load_csv(PERFORMANCE_FILE)
+    row = df[df["employee_id"] == employee_id]
+
+    if row.empty:
+        return f"❌ Employee ID {employee_id} not found."
+    row = row.iloc[0]
+    skills = row["skills_unlocked"]
+    if pd.isna(skills) or str(skills).strip().lower() in ["", "nan"]:
+        return f"❌ No skills unlocked yet."
+    else:
+        return f"👤 Skill Acquired: {skills}"
 
 
 # ---------------- MENU ----------------
@@ -111,7 +116,8 @@ def run_jai():
         emp_id = int(input("Enter Employee ID: "))
         print(get_weekly_nudge(emp_id))
     elif choice == "3":
-        print(get_skill_tree())
+        emp_id = int(input("Enter Employee ID: "))
+        print(get_skill_tree(emp_id))
     else:
         print("❌ Invalid choice.")
 
